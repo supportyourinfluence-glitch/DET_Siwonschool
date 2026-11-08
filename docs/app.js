@@ -109,12 +109,13 @@ function modeHref(mode) {
 const modeSwitch = mode => `<a class="mode-switch" href="${esc(modeHref(mode))}">${MODE_NAMES[mode]}로 보기 →</a>`;
 function applyModeParam() {
   const q = new URLSearchParams(location.search), mode = q.get("mode");
-  if (!MODE_NAMES[mode]) return;
+  if (!MODE_NAMES[mode]) return false;
   S.settings.mode = mode;
   saveLocal();
   q.delete("mode");
   const rest = q.toString().replace(/=(&|$)/g, "$1");
   history.replaceState(null, "", location.pathname + (rest ? "?" + rest : "") + location.hash);
+  return true;
 }
 const homeLabel = () => isExam() ? "홈으로" : "탐험 지도로";
 let saveFailed = false;
@@ -1542,6 +1543,7 @@ function route() {
   else home();
 }
 window.addEventListener("hashchange", route);
-applyModeParam();
-route();
+// 주소로 처음 열면 항상 모드 선택 화면부터 보여 준다. ?mode=, #day1 같은 주소로 열었을 때만 바로 들어간다.
+if (applyModeParam() || location.hash) route();
+else modeSelect();
 syncStart();
