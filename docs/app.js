@@ -106,7 +106,6 @@ function modeHref(mode) {
   q.set("mode", mode);
   return location.pathname + "?" + q.toString().replace(/=(&|$)/g, "$1");
 }
-const modeUrl = mode => location.origin + location.pathname + "?mode=" + mode;   // 남에게 보내는 주소라 ?demo는 넣지 않는다
 const modeSwitch = mode => `<a class="mode-switch" href="${esc(modeHref(mode))}">${MODE_NAMES[mode]}로 보기 →</a>`;
 function applyModeParam() {
   const q = new URLSearchParams(location.search), mode = q.get("mode");
@@ -791,27 +790,20 @@ function modeSelect() {
         <p class="mute">학습 방식을 고르세요. 나중에 학습 관리 화면에서 바꿀 수 있어요.</p>
       </header>
       <div class="mode-pick">
-        <div class="mode-col">
-        <button class="mode-card" data-mode="exam">
+        <a class="mode-card" href="${esc(modeHref("exam"))}">
           <span class="icon" aria-hidden="true">${icon("target")}</span>
           <strong>수험생 모드</strong>
           <span class="mute">목표 점수와 시험일에 맞춘 하루 분량, DET 유형별 정답률, 실전 모의</span>
           <span class="chip">고등학생 · 대학생 · 성인</span>
-        </button>
-        <p class="small mode-link">바로가기 <a href="${esc(modeUrl("exam"))}">${esc(modeUrl("exam"))}</a></p>
-        </div>
-        <div class="mode-col">
-        <button class="mode-card" data-mode="kids">
+        </a>
+        <a class="mode-card" href="${esc(modeHref("kids"))}">
           <span class="icon" aria-hidden="true">${icon("rocket")}</span>
           <strong>초등 탐험대 모드</strong>
           <span class="mute">10개 행성을 되찾는 이야기, 보스전, 적립 보상, 보호자 화면</span>
           <span class="chip">국제학교 · 조기유학 준비 초등생</span>
-        </button>
-        <p class="small mode-link">바로가기 <a href="${esc(modeUrl("kids"))}">${esc(modeUrl("kids"))}</a></p>
-        </div>
+        </a>
       </div>
     </div>`);
-  $$(".mode-card").forEach(b => { b.onclick = () => { S.settings.mode = b.dataset.mode; save(); home(); }; });
   $(".mode-card").focus();
 }
 function home() {

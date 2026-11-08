@@ -297,9 +297,6 @@ input[type=date], input[type=number], input[type=search], select { background: v
 .stop.locked .stop-main:hover, .day-row.locked .day-main:hover { background: none; }
 
 /* 모드 바로가기 링크 */
-.mode-col { display: grid; gap: 8px; align-content: start; }
-.mode-col .mode-card { height: 100%; }
-.mode-link { color: var(--mute); overflow-wrap: anywhere; padding: 0 4px; }
-.mode-link a { color: var(--blue); font-weight: 600; }
+.mode-card { text-decoration: none; }   /* 카드가 ?mode= 바로가기 링크라 밑줄을 없앤다 */
 .mode-switch { justify-self: end; color: var(--blue); font-weight: 700; font-size: 15px; text-decoration: none; padding: 4px 2px; }
 .mode-switch:hover { text-decoration: underline; }
