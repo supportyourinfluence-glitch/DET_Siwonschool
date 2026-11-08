@@ -8,7 +8,8 @@ self.addEventListener("install", e => {
 });
 self.addEventListener("activate", e => {
   e.waitUntil(caches.keys()
-    .then(keys => Promise.all(keys.filter(k => k !== CORE && k !== MEDIA).map(k => caches.delete(k))))
+    // 같은 주소의 다른 앱(원본 탐험대)의 저장본은 건드리지 않고, 이 앱의 옛 저장본만 지운다
+    .then(keys => Promise.all(keys.filter(k => k.startsWith("voca-") && k !== CORE && k !== MEDIA).map(k => caches.delete(k))))
     .then(() => self.clients.claim()));
 });
 

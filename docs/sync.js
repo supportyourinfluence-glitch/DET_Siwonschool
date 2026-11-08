@@ -1,10 +1,11 @@
 "use strict";
 /* 여러 기기 동기화: 같은 코드를 입력한 기기끼리 기록을 합친다.
    서버 주소와 공개 키가 비어 있으면 동기화 화면을 숨긴다. */
-const SYNC_URL = "https://fwiegxxwehrbpjihowdk.supabase.co";
+const SYNC_URL = "";   // 체험판: 동기화 끔
 const SYNC_KEY = "sb_publishable_UUZiG-9vwSVPDdWa5JYBSw_XTeGuCYT";   // 공개용 키. Secret key는 절대 넣지 않는다.
 
-const SYNC_CODE_KEY = "det_sync_code", SYNC_DEVICE_KEY = "det_device";
+// 원본 탐험대 앱과 같은 주소(github.io)에 올라가므로 저장 이름을 따로 쓴다. 같으면 두 앱의 동기화 기록이 섞인다.
+const SYNC_CODE_KEY = "det_vocab_sync_code", SYNC_DEVICE_KEY = "det_vocab_device";
 const syncEnabled = () => !!(SYNC_URL && SYNC_KEY);
 function syncStore(k, v) {
   try {
