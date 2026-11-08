@@ -99,6 +99,24 @@ function load() {
   return blank();
 }
 const isExam = () => S.settings.mode === "exam";
+// ?mode=exam / ?mode=kids 로 열면 그 모드로 바로 들어간다. 다른 주소 값(?demo 등)은 그대로 둔다.
+const MODE_NAMES = { exam: "수험생 모드", kids: "초등 탐험대 모드" };
+function modeHref(mode) {
+  const q = new URLSearchParams(location.search);
+  q.set("mode", mode);
+  return location.pathname + "?" + q.toString().replace(/=(&|$)/g, "$1");
+}
+const modeUrl = mode => location.origin + location.pathname + "?mode=" + mode;   // 남에게 보내는 주소라 ?demo는 넣지 않는다
+const modeSwitch = mode => `<a class="mode-switch" href="${esc(modeHref(mode))}">${MODE_NAMES[mode]}로 보기 →</a>`;
+function applyModeParam() {
+  const q = new URLSearchParams(location.search), mode = q.get("mode");
+  if (!MODE_NAMES[mode]) return;
+  S.settings.mode = mode;
+  saveLocal();
+  q.delete("mode");
+  const rest = q.toString().replace(/=(&|$)/g, "$1");
+  history.replaceState(null, "", location.pathname + (rest ? "?" + rest : "") + location.hash);
+}
 const homeLabel = () => isExam() ? "홈으로" : "탐험 지도로";
 let saveFailed = false;
 function saveLocal() { try { localStorage.setItem(KEY, JSON.stringify(S)); saveFailed = false; } catch (e) { saveFailed = true; } }
@@ -760,6 +778,7 @@ function prologue() {
         <p>하나도 틀리지 않고 모두 되찾으면 <b>${fmtWon(WON_GOAL)}</b>!</p>
       </div>
       <button class="btn primary big" id="go">탐험 떠나기 (Enter)</button>
+      ${modeSwitch("exam")}
     </div>`);
   $("#go").onclick = () => { S.storySeen = true; save(); home(); };
   $("#go").focus();
@@ -772,18 +791,24 @@ function modeSelect() {
         <p class="mute">학습 방식을 고르세요. 나중에 학습 관리 화면에서 바꿀 수 있어요.</p>
       </header>
       <div class="mode-pick">
+        <div class="mode-col">
         <button class="mode-card" data-mode="exam">
           <span class="icon" aria-hidden="true">${icon("target")}</span>
           <strong>수험생 모드</strong>
           <span class="mute">목표 점수와 시험일에 맞춘 하루 분량, DET 유형별 정답률, 실전 모의</span>
           <span class="chip">고등학생 · 대학생 · 성인</span>
         </button>
+        <p class="small mode-link">바로가기 <a href="${esc(modeUrl("exam"))}">${esc(modeUrl("exam"))}</a></p>
+        </div>
+        <div class="mode-col">
         <button class="mode-card" data-mode="kids">
           <span class="icon" aria-hidden="true">${icon("rocket")}</span>
           <strong>초등 탐험대 모드</strong>
           <span class="mute">10개 행성을 되찾는 이야기, 보스전, 적립 보상, 보호자 화면</span>
           <span class="chip">국제학교 · 조기유학 준비 초등생</span>
         </button>
+        <p class="small mode-link">바로가기 <a href="${esc(modeUrl("kids"))}">${esc(modeUrl("kids"))}</a></p>
+        </div>
       </div>
     </div>`);
   $$(".mode-card").forEach(b => { b.onclick = () => { S.settings.mode = b.dataset.mode; save(); home(); }; });
@@ -813,6 +838,7 @@ function home() {
         <div class="bar wallet-bar"><i style="width:${money.balance / WON_GOAL * 100}%"></i></div>
         <p class="mute small">퀴즈 단계 +${WON_STEP}원 · 보스 격파 +${WON_BOSS}원 · 틀리면 -${WON_STEP}원${S.lost ? ` · 지금까지 감점 ${fmtWon(S.lost)}` : ""}</p>
       </div>
+      ${modeSwitch("exam")}
     </header>
     <div class="stack">
       ${trialNote()}
@@ -917,6 +943,7 @@ function examHome() {
         <div class="bar goal-bar" role="img" aria-label="완성한 단어 ${mastered}개 중 ${WORDS.length}개"><i style="width:${seen / WORDS.length * 100}%" class="seen"></i><i style="width:${mastered / WORDS.length * 100}%"></i></div>
         <p class="small mute">${seen === WORDS.length ? `${WORDS.length}개를 모두 학습했어요. 이제 복습과 실전 모의로 다져요.` : S.settings.examDate ? `시험일까지 하루 새 단어 <b>${newN}</b>개씩 배우면 시험 5일 전에 ${WORDS.length}개를 모두 끝내요.` : `<button class="linkish" id="setDate">시험일을 입력</button>하면 하루 분량을 자동으로 계산해요.`}</p>
       </div>
+      ${modeSwitch("kids")}
     </header>
     <div class="stack">
       ${trialNote()}
@@ -1523,5 +1550,6 @@ function route() {
   else home();
 }
 window.addEventListener("hashchange", route);
+applyModeParam();
 route();
 syncStart();
