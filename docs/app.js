@@ -805,7 +805,6 @@ function modeSelect() {
         </a>
       </div>
     </div>`);
-  $(".mode-card").focus();
 }
 function home() {
   if (!S.settings.mode) return modeSelect();
