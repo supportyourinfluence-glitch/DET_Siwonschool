@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>이미지 출처</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="stars" aria-hidden="true"></div>
+<main id="app">
+  <p><a class="btn ghost" href="index.html">← 게임으로</a></p>
+  <p class="mute small">발음 음성은 오픈소스 음성 모델 Kokoro-82M(Apache 2.0)으로 만들었습니다.</p>
+  <h1>이미지 출처</h1>
+  <p class="mute small">모든 이미지는 크기를 줄여 사용했으며 각 이미지의 원래 라이선스를 따릅니다.</p>
+  <div class="panel" id="list" style="margin-top:14px"></div>
+</main>
+<script src="data.js"></script>
+<script src="images/credits.js"></script>
+<script>
+const esc = s => String(s || "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const safeUrl = u => /^https?:\/\//i.test(u || "") ? esc(u) : "";
+document.getElementById("list").innerHTML = WORDS.filter(w => IMG_CREDITS[w.id]).map(w => {
+  const c = IMG_CREDITS[w.id], url = safeUrl(c.page);
+  return `<p class="small" style="margin:0 0 8px;overflow-wrap:anywhere"><b class="en">DAY ${w.day} ${esc(w.w)}</b>: ${url ? `<a style="color:inherit" href="${url}" target="_blank" rel="noopener noreferrer">${esc(c.title)}</a>` : esc(c.title)} · ${esc(c.artist)} · ${esc(c.license)} · ${esc(c.src)}</p>`;
+}).join("");
+</script>
+</body>
+</html>
