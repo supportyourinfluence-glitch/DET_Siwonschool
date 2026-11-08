@@ -1,6 +1,6 @@
 "use strict";
 /* 오프라인 실행: 화면 파일은 최신판을 우선 받고, 이미지와 음성은 저장본을 우선 쓴다. */
-const CORE = "voca-core-v1", MEDIA = "voca-media-v1";   // 원본 탐험대 앱의 저장본과 섞이지 않게 이름을 바꿨다
+const CORE = "voca-core-v2", MEDIA = "voca-media-v1";   // 원본 탐험대 앱의 저장본과 섞이지 않게 이름을 바꿨다
 const CORE_FILES = ["./", "index.html", "style.css", "app.js", "data.js", "sync.js", "pwa.js", "credits.html", "images/credits.js", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png"];
 
 self.addEventListener("install", e => {
@@ -45,7 +45,9 @@ async function media(request) {
 }
 async function core(request) {
   const cache = await caches.open(CORE);
-  const network = fetch(request).then(r => { if (r.ok) cache.put(request, r.clone()); return r; });
+  // GitHub Pages는 10분 동안 저장본을 쓰라고 알려 준다. 화면 파일은 매번 서버에 새 판인지 물어본다.
+  const fresh = new Request(request.url, { cache: "no-cache", credentials: "same-origin" });
+  const network = fetch(fresh).then(r => { if (r.ok) cache.put(request, r.clone()); return r; });
   const saved = () => cache.match(request, { ignoreSearch: true }).then(r => r || (request.mode === "navigate" ? cache.match("index.html") : undefined));
   // 인터넷이 느리면 저장본을 먼저 보여 주고, 최신판은 뒤에서 받아 둔다
   const timeout = new Promise(resolve => setTimeout(resolve, 2500));
